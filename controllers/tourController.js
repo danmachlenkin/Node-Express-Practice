@@ -1,4 +1,3 @@
-const fs = require('fs');
 const Tour = require('../models/tourModel');
 
 // const tours = JSON.parse(
@@ -18,13 +17,22 @@ const Tour = require('../models/tourModel');
 //   next();
 // };
 
-exports.getTours = (req, res) => {
-  res.status(200).json({
-    status: 'success',
-    // data: {
-    //   tours,
-    // },
-  });
+exports.getTours = async (req, res) => {
+  try {
+    const tours = await Tour.find();
+    res.status(200).json({
+      status: 'success',
+      results: tours.length,
+      data: {
+        tours,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err,
+    });
+  }
 };
 
 exports.addTour = async (req, res) => {
@@ -44,18 +52,56 @@ exports.addTour = async (req, res) => {
   }
 };
 
-exports.getSpecificTour = (req, res) => {
-  res.status(200).json({
-    status: 'success',
-    // data: {
-    //   tour,
-    // },
-  });
+exports.getSpecificTour = async (req, res) => {
+  try {
+    const tour = await Tour.findById(req.params.id);
+    res.status(200).json({
+      status: 'success',
+      data: {
+        tour,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err,
+    });
+  }
 };
 
-exports.updateTour = (req, res) => {
-  res.status(200).json({
-    status: 'sucess',
-    message: 'tour got updated...',
-  });
+exports.updateTour = async (req, res) => {
+  try {
+    const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    res.status(200).json({
+      status: 'success',
+      data: {
+        tour,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
+exports.deleteTour = async (req, res) => {
+  try {
+    const deletedTour = await Tour.findByIdAndDelete(req.params.id);
+    res.status(200).json({
+      status: 'success',
+      data: {
+        deletedTour,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err,
+    });
+  }
 };
